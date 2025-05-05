@@ -22,7 +22,8 @@ gui:
 	./simv +UVM_TESTNAME=$(TEST) -gui/ &	
 # More advance make targets
 cov:
-	urg -report  coverage_report -dir  *.vdb
+	urg -report  coverage_report -dir ./results/*_build/SEED_*/*.vdb
+
 
 allclean:
 	clear
