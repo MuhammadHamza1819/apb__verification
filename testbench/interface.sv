@@ -13,9 +13,9 @@ interface apb_if (input logic PCLK, PRESETn);
   logic PSLVERR;
 
   covergroup cg @(posedge PCLK);
-    c1: coverpoint PADDR { bins b1 = {[0:50]};
-                           bins b2 = {[51:100]};
-                           ignore_bins = {[101:$]};
+    c1: coverpoint PADDR { bins       b1 = {[0:50]};
+                           bins       b2 = {[51:100]};
+                           ignore_bins b3 = {[101:$]};
                          }
 
     c2: coverpoint PWDATA{ bins b1 = {[0:100]};

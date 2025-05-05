@@ -15,11 +15,15 @@ class driver extends uvm_driver#(seq_item);
   task wait_for_reset_release();
     wait(!vif.PRESETn);
 
-    vif.PENABLE <= 0;
+    vif.PENABLE <= 1;
     vif.PWRITE  <= 0;
-    vif.PSEL    <= 0;
+    vif.PSEL    <= 1;
     vif.PADDR   <= 0;
     vif.PWDATA  <= 0;
+
+    #5;
+    vif.PENABLE <= 0;
+    vif.PSEL    <= 0;
 
     `uvm_info(get_type_name(), "Reset Released", UVM_LOW)
   endtask
@@ -29,14 +33,14 @@ class driver extends uvm_driver#(seq_item);
     @(posedge vif.PCLK);
     #5;
     vif.PADDR  <= req.PADDR;
-    vif.PWRITE <= 1;
-    vif.PSEL   <= 1;
+    vif.PWRITE <= req.PWRITE;
+    vif.PSEL   <= req.PSEL;
     vif.PWDATA <= req.PWDATA;
 
     @(posedge vif.PCLK);
 // 
-    vif.PSEL   <= 1;
-    vif.PENABLE <= 1;
+    vif.PSEL   <= req.PSEL;
+    vif.PENABLE <= req.PENABLE;
     
     @(posedge vif.PCLK);
     
@@ -49,7 +53,7 @@ class driver extends uvm_driver#(seq_item);
 		vif.PENABLE <= 0;
     	vif.PSEL    <= 0;		
     `uvm_info(get_type_name(), "----------------------------------------------------------------------------", UVM_LOW)
-    `uvm_info(get_type_name(), $sformatf("REQ: PADDR = %0d, PWDATA = %0h", req.PADDR, req.PWDATA), UVM_LOW)
+        `uvm_info(get_type_name(), $sformatf("REQ: PADDR = %0h, PWDATA = %0h", req.PADDR, req.PWDATA), UVM_LOW)
     `uvm_info(get_type_name(), $sformatf("PREADY = %d", vif.PREADY), UVM_LOW)
     `uvm_info(get_type_name(), "WRITE transaction_complete!", UVM_LOW)
     `uvm_info(get_type_name(), "----------------------------------------------------------------------------", UVM_LOW)
@@ -64,7 +68,7 @@ class driver extends uvm_driver#(seq_item);
     `uvm_info(get_type_name(), "READ transaction_start!", UVM_LOW)
 
     vif.PADDR  <= req.PADDR;
-    vif.PWRITE <= 0;
+    vif.PWRITE <= req.PWRITE;
     vif.PSEL   <= 1;
 
     @(posedge vif.PCLK);
@@ -81,12 +85,6 @@ class driver extends uvm_driver#(seq_item);
       begin
 		vif.PENABLE <= 0;
     	vif.PSEL    <= 0;		
-//     `uvm_info(get_type_name(), "----------------------------------------------------------------------------", UVM_LOW)
-//     `uvm_info(get_type_name(), $sformatf("PADDR = %0d, PRDATA = %0h", vif.PADDR, vif.PRDATA), UVM_LOW)
-        
-//     `uvm_info(get_type_name(), $sformatf("PREADY = %d", vif.PREADY), UVM_LOW)
-//      `uvm_info(get_type_name(), "read transaction_complete!", UVM_LOW)
-//     `uvm_info(get_type_name(), "----------------------------------------------------------------------------", UVM_LOW)
       end 
     
   endtask
@@ -100,12 +98,14 @@ class driver extends uvm_driver#(seq_item);
     forever begin
       @(posedge vif.PCLK);
       seq_item_port.get_next_item(req);   ///this method blocks untill the sequence is available
-   
-      do_write(req);
+   	
+      if(req.PWRITE)
+        do_write(req);
       
       @(posedge vif.PCLK);
-
-      do_read(req);
+	  
+      if(!req.PWRITE)
+      	do_read(req);
      
       seq_item_port.item_done();
     

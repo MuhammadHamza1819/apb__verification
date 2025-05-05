@@ -2,9 +2,10 @@ class seq_item extends uvm_sequence_item;
 
 randc bit [`ADDR_BUS_WIDTH-1:0] PADDR;
 randc bit [`DATA_BUS_WIDTH-1:0] PWDATA;
-  bit   PSEL;
-  bit   PENABLE;
-  bit   PWRITE;
+randc  bit   PWRITE;
+
+randc bit   PSEL;
+randc bit   PENABLE;
   
   bit [`DATA_BUS_WIDTH-1:0]PRDATA;
   bit PREADY;
@@ -25,4 +26,5 @@ randc bit [`DATA_BUS_WIDTH-1:0] PWDATA;
   `uvm_field_int(PSLVERR, UVM_ALL_ON)   
 `uvm_object_utils_end
 
+//   constraint addr_c {PADDR < 63;}
 endclass

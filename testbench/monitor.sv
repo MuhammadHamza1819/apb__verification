@@ -29,20 +29,20 @@ class monitor extends uvm_monitor;
       
       if (vif.PSEL && vif.PENABLE) begin
 		
-        mon_item.PADDR   = vif.PADDR; // dut se lelya 
+        mon_item.PADDR   = vif.PADDR;
         mon_item.PWRITE  = vif.PWRITE;
         mon_item.PENABLE = vif.PENABLE;
         mon_item.PSEL    = vif.PSEL;
-  	   mon_item.PSLVERR = vif.PSLVERR;
+  		
         
       @(posedge vif.PCLK);
       
         wait(vif.PREADY);
 
         mon_item.PREADY  = vif.PREADY;
-  		mon_item.PSLVERR = vif.PSLVERR;
+        
       @(posedge vif.PCLK);
-        if (vif.PWRITE) begin
+        if (vif.PWRITE && vif.PREADY && vif.PSEL) begin
           mon_item.PWDATA = vif.PWDATA;
           `uvm_info(get_type_name(), $sformatf("WRITE: PADDR=%0h, PWDATA=%0h", mon_item.PADDR, mon_item.PWDATA), UVM_LOW);
         end else if(!vif.PWRITE )

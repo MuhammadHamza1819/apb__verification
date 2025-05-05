@@ -6,7 +6,7 @@ import uvm_pkg::*;
 
 module tb_top;
   bit PCLK;
-  bit PRESETn;
+  bit PRESETn = 1;
   always #2 PCLK = ~PCLK;
   
   initial begin
@@ -15,6 +15,7 @@ module tb_top;
     #5; 
     PRESETn = 1;
   end
+
   apb_if vif(PCLK, PRESETn);
   
   apb_sram DUT
@@ -40,9 +41,11 @@ module tb_top;
     $dumpvars(0);
   end
   initial begin
-//     run_test("base_test");
-    run_test("directed_test");
+    run_test("base_test");
+//     run_test("directed_test");
 //     run_test("error_resp_test");
-
+      // run _test("random_test");
+    //  run _test("cover_missing_test");
+ 
   end
 endmodule
